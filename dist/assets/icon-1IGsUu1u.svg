@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0e172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </radialGradient>
+    <linearGradient id="neonCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f5ff" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <linearGradient id="neonGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#facc15" />
+      <stop offset="100%" stop-color="#ea580c" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)" stroke="#00f5ff" stroke-width="8" stroke-opacity="0.4" />
+
+  <!-- 8x8 Grid Circuit Substratum -->
+  <g stroke="rgba(0, 245, 255, 0.15)" stroke-width="2">
+    <line x1="96" y1="96" x2="416" y2="96" />
+    <line x1="96" y1="176" x2="416" y2="176" />
+    <line x1="96" y1="256" x2="416" y2="256" />
+    <line x1="96" y1="336" x2="416" y2="336" />
+    <line x1="96" y1="416" x2="416" y2="416" />
+    <line x1="96" y1="96" x2="96" y2="416" />
+    <line x1="176" y1="96" x2="176" y2="416" />
+    <line x1="256" y1="96" x2="256" y2="416" />
+    <line x1="336" y1="96" x2="336" y2="416" />
+    <line x1="416" y1="96" x2="416" y2="416" />
+  </g>
+
+  <!-- Polyomino Blocks in Neon -->
+  <!-- Cyan T-block -->
+  <rect x="176" y="176" width="76" height="76" rx="14" fill="url(#neonCyan)" filter="url(#glow)" />
+  <rect x="256" y="176" width="76" height="76" rx="14" fill="url(#neonCyan)" filter="url(#glow)" />
+  <rect x="336" y="176" width="76" height="76" rx="14" fill="url(#neonCyan)" filter="url(#glow)" />
+  <rect x="256" y="256" width="76" height="76" rx="14" fill="url(#neonCyan)" filter="url(#glow)" />
+
+  <!-- Golden Quantum Core -->
+  <rect x="256" y="256" width="76" height="76" rx="14" fill="url(#neonGold)" filter="url(#glow)" />
+  <polygon points="294,270 316,294 294,318 272,294" fill="#ffffff" filter="url(#glow)" />
+
+  <!-- Corner Magenta block -->
+  <rect x="96" y="336" width="76" height="76" rx="14" fill="#ec4899" filter="url(#glow)" />
+  <rect x="176" y="336" width="76" height="76" rx="14" fill="#ec4899" filter="url(#glow)" />
+
+  <!-- Energy Sparks -->
+  <circle cx="214" cy="136" r="6" fill="#00f5ff" filter="url(#glow)" />
+  <circle cx="376" cy="296" r="6" fill="#facc15" filter="url(#glow)" />
+</svg>

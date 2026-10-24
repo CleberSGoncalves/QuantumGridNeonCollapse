@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Quantum Grid: Neon Collapse • CrazyGames</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/icon-1IGsUu1u.svg">
+  <!-- CrazyGames SDK v3 Official -->
+  <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+  <script type="module" crossorigin src="./assets/index-BveTH7qe.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BE6C77RA.css">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Floating HUD (pointer-events: none) -->
+    <div id="in-game-hud">
+      <!-- Top Bar -->
+      <div class="hud-top-bar">
+        <div class="hud-left-group">
+          <button id="btn-pause-toggle" class="hud-btn" title="Pause">⏸</button>
+          
+          <div class="hud-badge">
+            <span id="label-points" class="label">PONTOS</span>
+            <span id="hud-score-val" class="val">0</span>
+          </div>
+
+          <div class="hud-badge">
+            <span id="label-coins" class="label">MOEDAS</span>
+            <span id="hud-coins-val" class="val">200</span>
+          </div>
+        </div>
+
+        <!-- 3-Star Progress Bar -->
+        <div class="hud-progress-wrapper">
+          <div class="hud-level-title" id="hud-level-title">SETOR 1</div>
+          <div class="hud-progress-track">
+            <div id="hud-progress-fill" class="hud-progress-fill"></div>
+            <div class="hud-star-marks">
+              <span id="star-mark-1" class="star-mark">★</span>
+              <span id="star-mark-2" class="star-mark">★</span>
+              <span id="star-mark-3" class="star-mark">★</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hud-right-group">
+          <!-- Early Approval Green Pulsating Button -->
+          <button id="btn-approve-level" class="btn-approve-pulse hidden">✅ CONCLUIR FASE (★) ➔</button>
+
+          <!-- Secondary Actions (Hidden on <= 768px, available in Sectors Modal) -->
+          <button id="btn-open-sectors" class="hud-btn secondary-action" title="Fases / Sectors">🗺️</button>
+          <button id="btn-open-daily" class="hud-btn secondary-action" title="Recompensa Diária">🎁</button>
+          <button id="btn-open-quests" class="hud-btn secondary-action" title="Missões">📜</button>
+          <button id="btn-open-shop" class="hud-btn secondary-action" title="Loja Matrix">🛒</button>
+          <button id="btn-open-spin" class="hud-btn secondary-action" title="Roleta da Sorte">🎡</button>
+
+          <button id="btn-sound-toggle" class="hud-btn">🔊</button>
+          <button id="btn-lang-toggle" class="hud-btn" style="font-size: 11px;">🇧🇷 PT</button>
+        </div>
+      </div>
+
+      <!-- Sub-HUD Objective Hint -->
+      <div id="hud-target-hint" class="hud-hint-container">
+        Estabilize os fluxos quânticos alinhando linhas ou colunas.
+      </div>
+
+      <!-- In-Game Power-up Action Row (Centered directly above tray) -->
+      <div class="hud-powerups-row">
+        <button id="btn-power-swap" class="powerup-btn" title="Reconfigurar Peças">
+          🔄 SWAP <span id="btn-power-swap-count" class="badge-count">2</span>
+        </button>
+        <button id="btn-power-emp" class="powerup-btn" title="Pulso EMP Central">
+          💥 EMP <span id="btn-power-emp-count" class="badge-count">1</span>
+        </button>
+        <button id="btn-power-laser" class="powerup-btn" title="Laser de Linha">
+          ⚡ LASER <span id="btn-power-laser-count" class="badge-count">1</span>
+        </button>
+      </div>
+
+      <!-- Footer Attribution & Info -->
+      <div class="hud-bottom-bar">
+        <span>⚡ ARRASTE E ENCAIXE NA GRADE 8x8</span>
+        <a href="https://kinomuse.com.br" target="_blank" rel="noopener noreferrer">kinomuse.com.br</a>
+      </div>
+    </div>
+
+    <!-- Modal: Dynamic Lore (Land in Gameplay <= 1 click) -->
+    <div id="modal-lore" class="game-modal hidden">
+      <div class="modal-content" style="text-align: center;">
+        <h3 style="color: #00f5ff; font-size: 20px; margin-bottom: 12px;">QUANTUM GRID: NEON COLLAPSE</h3>
+        <p style="font-size: 13px; line-height: 1.6; color: #cbd5e1; margin-bottom: 16px;">
+          <strong>ANO DE 2142</strong>: Os fluxos de dados quânticos da megalópole colapsaram.<br><br>
+          Alinhe blocos de energia pura na grade 8x8 para estabilizar os núcleos de rede antes que o sistema entre em reboot permanente!
+        </p>
+        <button id="btn-skip-lore" class="btn-primary" style="font-size: 16px;">INICIAR ESTABILIZAÇÃO ➔</button>
+      </div>
+    </div>
+
+    <!-- Modal: Pause -->
+    <div id="modal-pause" class="game-modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>PAUSA DO SISTEMA</h3>
+          <button class="btn-modal-close">&times;</button>
+        </div>
+        <p style="color: #94a3b8; font-size: 13px; text-align: center; margin-bottom: 14px;">
+          Fluxos quânticos congelados.
+        </p>
+        <div class="modal-actions">
+          <button id="btn-resume" class="btn-primary">CONTINUAR ➔</button>
+          <button id="btn-restart-game" class="btn-secondary">REINICIAR FASE 🔄</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Victory (Sector Cleared) -->
+    <div id="modal-victory" class="game-modal hidden">
+      <div class="modal-content" style="text-align: center;">
+        <h3 style="color: #10b981; font-size: 22px;">SETOR ESTABILIZADO!</h3>
+        <p id="victory-sector-name" style="color: #38bdf8; font-weight: 800; font-size: 14px; margin-top: 4px;">Setor 01</p>
+
+        <div id="victory-stars-display" class="victory-stars">
+          <span class="star-icon active">★</span>
+          <span class="star-icon active">★</span>
+          <span class="star-icon">★</span>
+        </div>
+
+        <p style="font-size: 14px; color: #94a3b8; margin: 12px 0;">
+          Pontuação: <strong id="victory-score" style="color: #fff;">0</strong><br>
+          Recompensa: <strong id="victory-coins" style="color: #facc15;">+150</strong>
+        </p>
+
+        <div class="modal-actions">
+          <button id="btn-double-victory-ad" class="btn-rewarded">DOBRAR RECOMPENSA (2X) 🎬</button>
+          <button id="btn-next-sector" class="btn-primary">PRÓXIMO SETOR ➔</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Game Over (Grid Collapsed) -->
+    <div id="modal-game-over" class="game-modal hidden">
+      <div class="modal-content" style="text-align: center;">
+        <h3 style="color: #ef4444; font-size: 22px;">COLAPSO QUÂNTICO!</h3>
+        <p style="color: #94a3b8; font-size: 13px; margin-top: 4px;">
+          Nenhuma peça restante cabe na grade 8x8.
+        </p>
+
+        <p style="font-size: 15px; color: #cbd5e1; margin: 16px 0;">
+          Pontos: <strong id="over-score" style="color: #00f5ff;">0</strong><br>
+          Recorde: <strong id="over-high" style="color: #facc15;">0</strong>
+        </p>
+
+        <div class="modal-actions">
+          <button id="btn-revive-ad" class="btn-rewarded">REVIVER COM PULSO EMP 🎬</button>
+          <button id="btn-restart-over" class="btn-primary">TENTAR NOVAMENTE ➔</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Sector Selection & Mobile Hub -->
+    <div id="modal-sectors" class="game-modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>SETORES DA REDE (15 FASES)</h3>
+          <button class="btn-modal-close">&times;</button>
+        </div>
+
+        <!-- Quick Hub Bar for Mobile Navigation -->
+        <div class="modal-hub-quick-bar">
+          <button class="hub-pill" onclick="document.getElementById('btn-open-daily').click()">🎁 Diário</button>
+          <button class="hub-pill" onclick="document.getElementById('btn-open-quests').click()">📜 Missões</button>
+          <button class="hub-pill" onclick="document.getElementById('btn-open-shop').click()">🛒 Loja</button>
+          <button class="hub-pill" onclick="document.getElementById('btn-open-spin').click()">🎡 Roleta</button>
+        </div>
+
+        <button id="btn-play-endless" class="btn-secondary" style="margin-bottom: 12px; width: 100%;">
+          ⚡ JOGAR MODO INFINITO (HIGH SCORE)
+        </button>
+
+        <div id="sectors-grid-list" class="sectors-grid"></div>
+      </div>
+    </div>
+
+    <!-- Modal: Quests & Missions -->
+    <div id="modal-quests" class="game-modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>MISSÕES QUÂNTICAS</h3>
+          <button class="btn-modal-close">&times;</button>
+        </div>
+
+        <h4 style="font-size: 12px; color: #00f5ff; margin-bottom: 6px;">MISSÕES DIÁRIAS</h4>
+        <div id="quests-daily-list"></div>
+
+        <h4 style="font-size: 12px; color: #f59e0b; margin: 12px 0 6px;">MISSÕES SEMANAIS</h4>
+        <div id="quests-weekly-list"></div>
+      </div>
+    </div>
+
+    <!-- Modal: Meta-Shop -->
+    <div id="modal-shop" class="game-modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>LOJA MATRIX & UPGRADES</h3>
+          <button class="btn-modal-close">&times;</button>
+        </div>
+
+        <h4 style="font-size: 12px; color: #00f5ff; margin-bottom: 8px;">TEMAS NEON DE BLOCOS</h4>
+        <div id="shop-themes-list" class="shop-grid"></div>
+
+        <h4 style="font-size: 12px; color: #facc15; margin: 10px 0 8px;">COMPRAR POWER-UPS</h4>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px;">
+            <span style="font-size: 12px; font-weight: 700;">🔄 Quantum Swap (+1)</span>
+            <button id="btn-buy-swap" class="btn-shop-buy" style="width: auto; padding: 6px 12px;">150 🪙</button>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px;">
+            <span style="font-size: 12px; font-weight: 700;">💥 Pulso EMP (+1)</span>
+            <button id="btn-buy-emp" class="btn-shop-buy" style="width: auto; padding: 6px 12px;">250 🪙</button>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px;">
+            <span style="font-size: 12px; font-weight: 700;">⚡ Laser de Linha (+1)</span>
+            <button id="btn-buy-laser" class="btn-shop-buy" style="width: auto; padding: 6px 12px;">300 🪙</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Lucky Spin (Roleta da Sorte) -->
+    <div id="modal-spin" class="game-modal hidden">
+      <div class="modal-content" style="text-align: center;">
+        <div class="modal-header">
+          <h3>ROLETA DA SORTE</h3>
+          <button class="btn-modal-close">&times;</button>
+        </div>
+
+        <div class="lucky-wheel-container">
+          <div class="wheel-outer">
+            <div class="wheel-pointer"></div>
+            <div id="lucky-wheel-disc" class="wheel-disc"></div>
+          </div>
+        </div>
+
+        <p id="spin-result-text" style="font-size: 13px; color: #facc15; font-weight: 800; min-height: 20px;"></p>
+
+        <div class="modal-actions">
+          <button id="btn-spin-wheel" class="btn-primary">GIRAR GRÁTIS (12H) 🎯</button>
+          <button id="btn-spin-wheel-ad" class="btn-rewarded">GIRO EXTRA COM VÍDEO 🎬</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Daily 7-Day Rewards -->
+    <div id="modal-daily" class="game-modal hidden">
+      <div class="modal-content" style="text-align: center;">
+        <div class="modal-header">
+          <h3>RECOMPENSA DIÁRIA (7 DIAS)</h3>
+          <button class="btn-modal-close">&times;</button>
+        </div>
+
+        <div id="daily-calendar-grid" class="daily-grid"></div>
+
+        <button id="btn-claim-daily-reward" class="btn-primary" style="margin-top: 10px;">RESGATAR RECOMPENSA</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
